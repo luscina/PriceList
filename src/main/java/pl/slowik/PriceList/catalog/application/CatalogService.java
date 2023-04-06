@@ -1,43 +1,26 @@
 package pl.slowik.PriceList.catalog.application;
 
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RestController;
+import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
+import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
+import pl.slowik.PriceList.catalog.domain.Notebook;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
 
 @Service
-public class CatalogService {
-    public void initialize() {
-        FileInputStream file;
-        {
-            try {
-                file = new FileInputStream(new File("CENNIK SMB 15.03.2023.xls"));
-                HSSFWorkbook workbook = new HSSFWorkbook(file);
-                HSSFSheet sheet = workbook.getSheetAt(0);
-                HSSFRow headers = sheet.getRow(1);
-                Iterator<Row> rowIterator = sheet.iterator();
-                int physicalNumberOfCells = headers.getPhysicalNumberOfCells();
-                System.out.println(physicalNumberOfCells);
-                Iterator<Cell> cellIterator = headers.iterator();
-                while (cellIterator.hasNext()) {
-                    Cell cell = cellIterator.next();
-                    if (cell.getCellType().equals(CellType.STRING)) {
-                        System.out.println(cell.getStringCellValue());
-                    } else if (cell.getCellType().equals(CellType.NUMERIC)) {
-                        System.out.println(cell.getNumericCellValue());
-                    }
-                }
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
+@AllArgsConstructor
+class CatalogService implements CatalogUseCase {
+    private final JpaNotebookRepository jpaNotebookRepository;
+
+    public Optional<Notebook> findById(Long id) {
+        return jpaNotebookRepository.findById(id);
+    }
+
+    @Override
+    public List<Notebook> findAll() {
+        return jpaNotebookRepository.findAll();
     }
 }
