@@ -1,66 +1,70 @@
 package pl.slowik.PriceList.catalog.application;
 
 import lombok.AllArgsConstructor;
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
 import pl.slowik.PriceList.catalog.domain.Notebook;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class CatalogInitializeService {
     private final JpaNotebookRepository notebookRepository;
     @Transactional
     public void initialize() {
         FileInputStream file;
             try {
-                file = new FileInputStream(new File("CENNIK SMB 15.03.2023.xls"));
+                file = new FileInputStream("CENNIK SMB 15.03.2023.xls");
                 HSSFWorkbook workbook = new HSSFWorkbook(file);
-                HSSFSheet sheet = workbook.getSheetAt(0);
-                String sheetName = sheet.getSheetName();
-                int lastRowNum = sheet.getLastRowNum();
-                System.out.println(sheetName + " " + lastRowNum);
+                HSSFSheet sheet = workbook.getSheetAt(workbook.getSheetIndex("Notebooki"));
+                HSSFRow headersRow = sheet.getRow(1);
+                List<String> headersValue = new ArrayList<>();
+                for (int i = 0; i < headersRow.getLastCellNum(); i++) {
+                    headersValue.add(getCellValue(headersRow.getCell(i)));
+                }
+                for(String s : headersValue){
+                    log.info(s + " " + headersValue.indexOf(s));
+                }
                 for (int i = 2; i < 279; i++) {
                     Notebook notebook = new Notebook();
                     HSSFRow row = sheet.getRow(i);
-                    notebook.setPn(row.getCell(0).getStringCellValue());
-                    notebook.setEanCode(row.getCell(1).getStringCellValue());
-                    notebook.setProductFamily(row.getCell(2).getStringCellValue());
-                    notebook.setProductSeries(row.getCell(3).getStringCellValue());
-                    notebook.setStatus(row.getCell(4).getStringCellValue());
-                    notebook.setBpPrice(BigDecimal.valueOf(row.getCell(5).getNumericCellValue()));
-                    notebook.setBpPricePln(BigDecimal.valueOf(row.getCell(6).getNumericCellValue()));
-                    notebook.setSrpPrice(BigDecimal.valueOf(row.getCell(7).getNumericCellValue()));
-                    notebook.setBase(getCellValue(row.getCell(8)));
-                    notebook.setColor(getCellValue(row.getCell(9)));
-                    notebook.setPanel(row.getCell(10).getStringCellValue());
-                    notebook.setCup(row.getCell(11).getStringCellValue());
-                    notebook.setMemory(row.getCell(12).getStringCellValue());
-                    notebook.setSsd(row.getCell(13).getStringCellValue());
-                    notebook.setHdd(row.getCell(14).getStringCellValue());
-                    notebook.setGraphics(row.getCell(15).getStringCellValue());
-                    notebook.setOdd(row.getCell(16).getStringCellValue());
-                    notebook.setWlan(row.getCell(17).getStringCellValue());
-                    notebook.setWwan(getCellValue(row.getCell(18)));
-                    notebook.setBacklit(row.getCell(19).getStringCellValue());
-                    notebook.setFrp(row.getCell(20).getStringCellValue());
-                    notebook.setCamera(row.getCell(21).getStringCellValue());
-                    notebook.setKeyboard(row.getCell(22).getStringCellValue());
-                    notebook.setCardReader(getCellValue(row.getCell(23)));
-                    notebook.setOs(row.getCell(24).getStringCellValue());
-                    notebook.setWarranty(row.getCell(25).getStringCellValue());
-                    notebook.setBattery(row.getCell(26).getStringCellValue());
-                    notebook.setAdapter(row.getCell(27).getStringCellValue());
+                    notebook.setPn(row.getCell(headersValue.indexOf("PN")).getStringCellValue());
+                    notebook.setEanCode(row.getCell(headersValue.indexOf("UPC_EAN_JAN_code")).getStringCellValue());
+                    notebook.setProductFamily(row.getCell(headersValue.indexOf("Product FAMILY")).getStringCellValue());
+                    notebook.setProductSeries(row.getCell(headersValue.indexOf("Product Series")).getStringCellValue());
+                    notebook.setStatus(row.getCell(headersValue.indexOf("Status")).getStringCellValue());
+                    notebook.setBpPrice(BigDecimal.valueOf(row.getCell(headersValue.indexOf("BP Estimated € Price")).getNumericCellValue()));
+                    notebook.setBpPricePln(BigDecimal.valueOf(row.getCell(headersValue.indexOf("BP PLN")).getNumericCellValue()));
+                    notebook.setSrpPrice(BigDecimal.valueOf(row.getCell(headersValue.indexOf("SRP incl. VAT (PLN)")).getNumericCellValue()));
+                    notebook.setBase(getCellValue(row.getCell(headersValue.indexOf("Base"))));
+                    notebook.setColor(getCellValue(row.getCell(headersValue.indexOf("Color"))));
+                    notebook.setPanel(row.getCell(headersValue.indexOf("Panel")).getStringCellValue());
+                    notebook.setCup(row.getCell(headersValue.indexOf("CPU")).getStringCellValue());
+                    notebook.setMemory(row.getCell(headersValue.indexOf("Memory")).getStringCellValue());
+                    notebook.setSsd(row.getCell(headersValue.indexOf("SSD")).getStringCellValue());
+                    notebook.setHdd(row.getCell(headersValue.indexOf("HDD")).getStringCellValue());
+                    notebook.setGraphics(row.getCell(headersValue.indexOf("Graphics")).getStringCellValue());
+                    notebook.setOdd(row.getCell(headersValue.indexOf("ODD")).getStringCellValue());
+                    notebook.setWlan(row.getCell(headersValue.indexOf("WLAN")).getStringCellValue());
+                    notebook.setWwan(getCellValue(row.getCell(headersValue.indexOf("WWAN"))));
+                    notebook.setBacklit(row.getCell(headersValue.indexOf("Backlit")).getStringCellValue());
+                    notebook.setFrp(row.getCell(headersValue.indexOf("FPR")).getStringCellValue());
+                    notebook.setCamera(row.getCell(headersValue.indexOf("Camera")).getStringCellValue());
+                    notebook.setKeyboard(row.getCell(headersValue.indexOf("Keyboard")).getStringCellValue());
+                    notebook.setCardReader(getCellValue(row.getCell(headersValue.indexOf("CardReader"))));
+                    notebook.setOs(row.getCell(headersValue.indexOf("OS")).getStringCellValue());
+                    notebook.setWarranty(row.getCell(headersValue.indexOf("Warranty")).getStringCellValue());
+                    notebook.setBattery(row.getCell(headersValue.indexOf("Battery")).getStringCellValue());
+                    notebook.setAdapter(row.getCell(headersValue.indexOf("Adapter")).getStringCellValue());
                     notebookRepository.save(notebook);
                 }
             } catch (IOException e) {
@@ -71,7 +75,8 @@ public class CatalogInitializeService {
     private String getCellValue(HSSFCell cell) {
         if(cell.getCellType().equals(CellType.NUMERIC)){
             return String.valueOf(cell.getNumericCellValue());
-        }else
+        }else if(cell.getCellType().equals(CellType.STRING))
             return cell.getStringCellValue();
+        else return "";
     }
 }
