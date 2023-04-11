@@ -4,15 +4,25 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.PatternFormatting;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
 import pl.slowik.PriceList.catalog.domain.Notebook;
+
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @AllArgsConstructor
@@ -30,9 +40,6 @@ public class CatalogInitializeService {
                 List<String> headersValue = new ArrayList<>();
                 for (int i = 0; i < headersRow.getLastCellNum(); i++) {
                     headersValue.add(getCellValue(headersRow.getCell(i)));
-                }
-                for(String s : headersValue){
-                    log.info(s + " " + headersValue.indexOf(s));
                 }
                 for (int i = 2; i < 279; i++) {
                     Notebook notebook = new Notebook();
@@ -70,6 +77,41 @@ public class CatalogInitializeService {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
+    }
+
+    public void initializeOCM(){
+        FileInputStream file;
+        try {
+            file = new FileInputStream("ocm_apr_2023.xlsx");
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+            XSSFSheet sheet = workbook.getSheetAt(4);
+            XSSFRow headersRow = sheet.getRow(1);
+            int headersRowLastCellNum = headersRow.getLastCellNum();
+            List<List<String>> codesList = new ArrayList<>();
+            for (int i = 3; i < 39 ; i++) {
+                XSSFCell cell = headersRow.getCell(i);
+                List<String> codes = extractModelCode(cell.getStringCellValue());
+                codesList.add(codes);
+                }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private List<String> extractModelCode(String header) {
+        String pattern = "\\b2[A-Za-z0-9]{3}\\b";
+        Pattern regex = Pattern.compile(pattern);
+        Matcher matcher = regex.matcher(header);
+        List<String> codes = new ArrayList<>();
+        while (matcher.find()){
+            String code = matcher.group(0);
+            if(!codes.contains(code)){
+                codes.add(code);
+            }
+        }
+        if(codes.size() > 1) {
+            return codes;
+        } else return null;
     }
 
     private String getCellValue(HSSFCell cell) {
