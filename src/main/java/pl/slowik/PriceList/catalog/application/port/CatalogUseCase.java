@@ -2,12 +2,12 @@ package pl.slowik.PriceList.catalog.application.port;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.NoArgsConstructor;
 import lombok.Value;
 import pl.slowik.PriceList.catalog.domain.Notebook;
-
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+
 
 public interface CatalogUseCase {
     Optional<Notebook> findById(Long id);
@@ -20,8 +20,8 @@ public interface CatalogUseCase {
     @AllArgsConstructor
     class UpdateNotebookPriceCommand {
         Long id;
-        BigDecimal bpPrice;
-        BigDecimal pbPricePln;
-        BigDecimal srpPrice;
+        double bpPrice;
+        double pbPricePln;
+        double srpPrice;
     }
 }

@@ -88,9 +88,9 @@ public class CatalogController {
     @Data
     private static class RestNotebookPriceUpdateCommand {
         Long id;
-        BigDecimal bpPrice;
-        BigDecimal pbPricePln;
-        BigDecimal srpPrice;
+        double bpPrice;
+        double pbPricePln;
+        double srpPrice;
 
         UpdateNotebookPriceCommand toUpdateNotebookPriceCommand(Long id) {
             return new UpdateNotebookPriceCommand(id, bpPrice, pbPricePln, srpPrice);

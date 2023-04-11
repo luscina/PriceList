@@ -6,6 +6,7 @@ import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,7 +24,7 @@ class CatalogService implements CatalogUseCase {
         return jpaNotebookRepository.findAll();
     }
 
-    public void updateNotebookPrice(UpdateNotebookPriceCommand command){
+    public void updateNotebookPrice(UpdateNotebookPriceCommand command) {
         jpaNotebookRepository
                 .findById(command.getId())
                 .map(notebook -> updatePrice(notebook, command))
@@ -31,9 +32,9 @@ class CatalogService implements CatalogUseCase {
     }
 
     private Notebook updatePrice(Notebook notebook, UpdateNotebookPriceCommand command) {
-        notebook.setBpPrice(command.getBpPrice());
-        notebook.setBpPricePln(command.getPbPricePln());
-        notebook.setSrpPrice(command.getSrpPrice());
+        notebook.setBpPrice(BigDecimal.valueOf(command.getBpPrice()));
+        notebook.setBpPricePln(BigDecimal.valueOf(command.getPbPricePln()));
+        notebook.setSrpPrice(BigDecimal.valueOf(command.getSrpPrice()));
         jpaNotebookRepository.save(notebook);
         return notebook;
     }

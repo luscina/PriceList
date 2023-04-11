@@ -6,5 +6,6 @@ class CatalogControllerTest {
 
     @Test
     void updateNotebookPrice() {
+
     }
 }
