@@ -2,7 +2,6 @@ package pl.slowik.PriceList.catalog.application.port;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.NoArgsConstructor;
 import lombok.Value;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 import java.util.List;
@@ -14,6 +13,7 @@ public interface CatalogUseCase {
     List<Notebook> findAll();
     void deleteById(Long id);
     void updateNotebookPrice(UpdateNotebookPriceCommand command);
+
 
     @Value
     @Builder

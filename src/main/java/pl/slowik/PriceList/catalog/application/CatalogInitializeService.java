@@ -4,23 +4,23 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.hssf.usermodel.*;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.PatternFormatting;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.slowik.PriceList.catalog.db.JpaComponentRepository;
+import pl.slowik.PriceList.catalog.db.JpaModelRepository;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
+import pl.slowik.PriceList.catalog.domain.Component;
+import pl.slowik.PriceList.catalog.domain.Model;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -29,8 +29,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class CatalogInitializeService {
     private final JpaNotebookRepository notebookRepository;
+    private final JpaComponentRepository componentRepository;
+    private final JpaModelRepository modelRepository;
     @Transactional
-    public void initialize() {
+    public void initializeNotebooks() {
         FileInputStream file;
             try {
                 file = new FileInputStream("CENNIK SMB 15.03.2023.xls");
@@ -39,7 +41,7 @@ public class CatalogInitializeService {
                 HSSFRow headersRow = sheet.getRow(1);
                 List<String> headersValue = new ArrayList<>();
                 for (int i = 0; i < headersRow.getLastCellNum(); i++) {
-                    headersValue.add(getCellValue(headersRow.getCell(i)));
+                    headersValue.add(getHSSFCellValue(headersRow.getCell(i)));
                 }
                 for (int i = 2; i < 279; i++) {
                     Notebook notebook = new Notebook();
@@ -52,8 +54,8 @@ public class CatalogInitializeService {
                     notebook.setBpPrice(BigDecimal.valueOf(row.getCell(headersValue.indexOf("BP Estimated € Price")).getNumericCellValue()));
                     notebook.setBpPricePln(BigDecimal.valueOf(row.getCell(headersValue.indexOf("BP PLN")).getNumericCellValue()));
                     notebook.setSrpPrice(BigDecimal.valueOf(row.getCell(headersValue.indexOf("SRP incl. VAT (PLN)")).getNumericCellValue()));
-                    notebook.setBase(getCellValue(row.getCell(headersValue.indexOf("Base"))));
-                    notebook.setColor(getCellValue(row.getCell(headersValue.indexOf("Color"))));
+                    notebook.setBase(getHSSFCellValue(row.getCell(headersValue.indexOf("Base"))));
+                    notebook.setColor(getHSSFCellValue(row.getCell(headersValue.indexOf("Color"))));
                     notebook.setPanel(row.getCell(headersValue.indexOf("Panel")).getStringCellValue());
                     notebook.setCup(row.getCell(headersValue.indexOf("CPU")).getStringCellValue());
                     notebook.setMemory(row.getCell(headersValue.indexOf("Memory")).getStringCellValue());
@@ -62,12 +64,12 @@ public class CatalogInitializeService {
                     notebook.setGraphics(row.getCell(headersValue.indexOf("Graphics")).getStringCellValue());
                     notebook.setOdd(row.getCell(headersValue.indexOf("ODD")).getStringCellValue());
                     notebook.setWlan(row.getCell(headersValue.indexOf("WLAN")).getStringCellValue());
-                    notebook.setWwan(getCellValue(row.getCell(headersValue.indexOf("WWAN"))));
+                    notebook.setWwan(getHSSFCellValue(row.getCell(headersValue.indexOf("WWAN"))));
                     notebook.setBacklit(row.getCell(headersValue.indexOf("Backlit")).getStringCellValue());
                     notebook.setFrp(row.getCell(headersValue.indexOf("FPR")).getStringCellValue());
                     notebook.setCamera(row.getCell(headersValue.indexOf("Camera")).getStringCellValue());
                     notebook.setKeyboard(row.getCell(headersValue.indexOf("Keyboard")).getStringCellValue());
-                    notebook.setCardReader(getCellValue(row.getCell(headersValue.indexOf("CardReader"))));
+                    notebook.setCardReader(getHSSFCellValue(row.getCell(headersValue.indexOf("CardReader"))));
                     notebook.setOs(row.getCell(headersValue.indexOf("OS")).getStringCellValue());
                     notebook.setWarranty(row.getCell(headersValue.indexOf("Warranty")).getStringCellValue());
                     notebook.setBattery(row.getCell(headersValue.indexOf("Battery")).getStringCellValue());
@@ -78,31 +80,97 @@ public class CatalogInitializeService {
                 throw new RuntimeException(e);
             }
     }
-
-    public void initializeOCM(){
+    @Transactional
+    public void initializeComponents() {
+        FileInputStream file;
+        try{
+            file = new FileInputStream("CENNIK SMB 15.03.2023.xls");
+            HSSFWorkbook workbook = new HSSFWorkbook(file);
+            HSSFSheet sheet = workbook.getSheetAt(workbook.getSheetIndex("Akcesoria"));
+            HSSFRow headersRow = sheet.getRow(1);
+            List<String> headersValue = new ArrayList<>();
+            for (int i = 0; i < headersRow.getLastCellNum(); i++) {
+                headersValue.add(getHSSFCellValue(headersRow.getCell(i)));
+            }
+            for (int i = 2; i < sheet.getLastRowNum(); i++) {
+                if(!isHSSFCellEmpty(sheet.getRow(i).getCell(0))){
+                    HSSFRow row = sheet.getRow(i);
+                    Component component = new Component();
+                    component.setPn(getHSSFCellValue(row.getCell(headersValue.indexOf("PN"))));
+                    component.setCategory(getHSSFCellValue(row.getCell(headersValue.indexOf("Category"))));
+                    component.setSubCategory(getHSSFCellValue(row.getCell(headersValue.indexOf("SubCategory"))));
+                    component.setName(getHSSFCellValue(row.getCell(headersValue.indexOf("DESCRIPTION"))));
+                    if (!isHSSFCellEmpty(row.getCell(headersValue.indexOf("EAN code")))){
+                        component.setEAN(getHSSFCellValue(row.getCell(headersValue.indexOf("EAN code"))));
+                    }
+                    component.setBpPrice(BigDecimal.valueOf(row.getCell(headersValue.indexOf("BP Estimated € Price")).getNumericCellValue()));
+                    componentRepository.save(component);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Transactional
+    public void initializeOCM() {
         FileInputStream file;
         try {
             file = new FileInputStream("ocm_apr_2023.xlsx");
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             XSSFSheet sheet = workbook.getSheetAt(4);
             XSSFRow headersRow = sheet.getRow(1);
-            int headersRowLastCellNum = headersRow.getLastCellNum();
-            List<List<String>> codesList = new ArrayList<>();
+            List<Set<String>> codesList = new ArrayList<>();
             for (int i = 3; i < 39 ; i++) {
                 XSSFCell cell = headersRow.getCell(i);
-                List<String> codes = extractModelCode(cell.getStringCellValue());
+                Set<String> codes = extractModelCode(cell.getStringCellValue());
                 codesList.add(codes);
+                for(String code: codes) {
+                        Model model = new Model();
+                        model.setPn(code);
+                        Set<Component> components = new HashSet<>();
+                        for (int j = 3; j < sheet.getLastRowNum(); j++) {
+                            if(!(sheet.getRow(j) == null)) {
+                                XSSFRow row = sheet.getRow(j);
+                                if (!isXSSFCellEmpty(row.getCell(i))) {
+                                    String cellValue = getXSSFCellValue(row.getCell(i));
+                                    if(componentRepository.findByPn(getXSSFCellValue(row.getCell(2))).isPresent()) {
+                                        Component component = componentRepository.findByPn(getXSSFCellValue(row.getCell(2))).orElseThrow();
+                                        model.addComponent(component);
+                                        component.addModel(model);
+                                        componentRepository.save(component);
+                                        modelRepository.save(model);
+                                    }
+                                }
+                            }
+                        }
                 }
+            }
+            int lastCellNum = sheet.getRow(1).getLastCellNum();
+//            for (int i = 0; i < sheet.getLastRowNum(); i++) {
+//                if (!(sheet.getRow(i) == null)) {
+//                    XSSFRow row = sheet.getRow(i);
+//                    if (!isXSSFCellEmpty(row.getCell(2))) {
+//                        for (int j = 3; j < 36; j++) {
+//                            if (!isXSSFCellEmpty(row.getCell(j))) {
+//                                for(String code: codesList.get(j-1)){
+//                                    Component component = componentRepository.findByPn(row.getCell(2).getStringCellValue()).orElseThrow();
+//                                    log.info(component.getName());
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
 
-    private List<String> extractModelCode(String header) {
+    private Set<String> extractModelCode(String header) {
         String pattern = "\\b2[A-Za-z0-9]{3}\\b";
         Pattern regex = Pattern.compile(pattern);
         Matcher matcher = regex.matcher(header);
-        List<String> codes = new ArrayList<>();
+        Set<String> codes = new HashSet<>();
         while (matcher.find()){
             String code = matcher.group(0);
             if(!codes.contains(code)){
@@ -114,7 +182,45 @@ public class CatalogInitializeService {
         } else return null;
     }
 
-    private String getCellValue(HSSFCell cell) {
+    public static boolean isHSSFCellEmpty(final HSSFCell cell) {
+        if (cell == null) {
+            return true;
+        }
+
+        if (cell.getCellType() == CellType.BLANK) {
+            return true;
+        }
+
+        if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+    public static boolean isXSSFCellEmpty(final XSSFCell cell) {
+        if (cell == null) {
+            return true;
+        }
+
+        if (cell.getCellType() == CellType.BLANK) {
+            return true;
+        }
+
+        if (cell.getCellType() == CellType.STRING && cell.getStringCellValue().trim().isEmpty()) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private String getHSSFCellValue(HSSFCell cell) {
+        if(cell.getCellType().equals(CellType.NUMERIC)){
+            return String.valueOf(cell.getNumericCellValue());
+        }else if(cell.getCellType().equals(CellType.STRING))
+            return cell.getStringCellValue();
+        else return "";
+    }
+    private String getXSSFCellValue(XSSFCell cell) {
         if(cell.getCellType().equals(CellType.NUMERIC)){
             return String.valueOf(cell.getNumericCellValue());
         }else if(cell.getCellType().equals(CellType.STRING))

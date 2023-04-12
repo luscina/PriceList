@@ -14,7 +14,8 @@ public class CatalogAdminController {
     @PostMapping("/admin")
     @Transactional
     public void initialize(){
-        //catalogInitializeService.initialize();
+        catalogInitializeService.initializeNotebooks();
+        catalogInitializeService.initializeComponents();
         catalogInitializeService.initializeOCM();
     }
 }
