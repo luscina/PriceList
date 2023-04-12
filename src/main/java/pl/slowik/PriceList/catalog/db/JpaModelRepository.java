@@ -6,5 +6,4 @@ import pl.slowik.PriceList.catalog.domain.Model;
 import java.util.Optional;
 
 public interface JpaModelRepository extends JpaRepository<Model, Long> {
-    Optional<Model> findByPn(String pn);
 }
