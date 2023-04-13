@@ -137,7 +137,6 @@ public class CatalogInitializeService {
                                         Component component = componentRepository.findByPn(getXSSFCellValue(row.getCell(2))).orElseThrow();
                                         model.addComponent(component);
                                         component.addModel(model);
-                                        componentRepository.save(component);
                                         modelRepository.save(model);
                                     }
                                 }
