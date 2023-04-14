@@ -14,6 +14,7 @@ import pl.slowik.PriceList.catalog.db.JpaComponentRepository;
 import pl.slowik.PriceList.catalog.db.JpaModelRepository;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
 import pl.slowik.PriceList.catalog.domain.Component;
+import pl.slowik.PriceList.catalog.domain.ComponentModel;
 import pl.slowik.PriceList.catalog.domain.Model;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 
@@ -111,58 +112,70 @@ public class CatalogInitializeService {
             throw new RuntimeException(e);
         }
     }
+
     @Transactional
-    public void initializeOCM() {
+    public void initializeModels() {
         FileInputStream file;
         try {
             file = new FileInputStream("ocm_apr_2023.xlsx");
             XSSFWorkbook workbook = new XSSFWorkbook(file);
-            XSSFSheet sheet = workbook.getSheetAt(4);
-            XSSFRow headersRow = sheet.getRow(1);
-            List<Set<String>> codesList = new ArrayList<>();
-            for (int i = 3; i < 39 ; i++) {
-                XSSFCell cell = headersRow.getCell(i);
-                Set<String> codes = extractModelCode(cell.getStringCellValue());
-                codesList.add(codes);
-                for(String code: codes) {
-                        Model model = new Model();
-                        model.setPn(code);
-                        Set<Component> components = new HashSet<>();
-                        for (int j = 3; j < sheet.getLastRowNum(); j++) {
-                            if(!(sheet.getRow(j) == null)) {
-                                XSSFRow row = sheet.getRow(j);
-                                if (!isXSSFCellEmpty(row.getCell(i))) {
-                                    String cellValue = getXSSFCellValue(row.getCell(i));
-                                    if(componentRepository.findByPn(getXSSFCellValue(row.getCell(2))).isPresent()) {
-                                        Component component = componentRepository.findByPn(getXSSFCellValue(row.getCell(2))).orElseThrow();
-                                        model.addComponent(component);
-                                        component.addModel(model);
-                                        modelRepository.save(model);
+            List<Integer> commercialOcmTabsIndex = getTabsIndexesList(workbook);
+            //for(int tabIndex : commercialOcmTabsIndex) { //iteration through sheets
+                XSSFSheet sheet = workbook.getSheetAt(4);
+                int lastRowNum = sheet.getLastRowNum();
+                XSSFRow headersRow = sheet.getRow(1);
+                short lastColumnNum = headersRow.getLastCellNum();
+                for (int columnIndex = 3; columnIndex < lastColumnNum; columnIndex++) {  //iteration through columns
+                    XSSFCell headersRowCell = headersRow.getCell(columnIndex);
+                    if(!isXSSFCellEmpty(headersRowCell)) {
+                        Set<String> codes = extractModelCode(headersRowCell.getStringCellValue());
+                        if (codes != null) {
+                            for (String code : codes) {
+                                log.info(code);
+                                Model model = new Model();
+                                model.setPn(code);
+                                for (int rowIndex = 3; rowIndex < lastRowNum; rowIndex++) { //iteration through rows
+                                    if(sheet.getRow(rowIndex) != null) {
+                                        XSSFRow row = sheet.getRow(rowIndex);
+                                        if (!isXSSFCellEmpty(row.getCell(2))) {//checking if there is component PN
+                                            if(!isXSSFCellEmpty(row.getCell(columnIndex))) {
+                                                Optional<Component> optionalComponent = componentRepository.findByPn(getXSSFCellValue(row.getCell(2)));
+                                                if(optionalComponent.isPresent()) {
+                                                    Component component = optionalComponent.orElseThrow();
+                                                    ComponentModel componentModel = new ComponentModel(component, model);
+                                                    componentModel.setComment(getXSSFCellValue(row.getCell(columnIndex)));
+                                                    model.addComponentModel(componentModel);
+                                                }
+                                            }
+                                        }
                                     }
                                 }
+                                modelRepository.save(model);
                             }
                         }
+                    }
                 }
+            //}
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-            int lastCellNum = sheet.getRow(1).getLastCellNum();
-//            for (int i = 0; i < sheet.getLastRowNum(); i++) {
-//                if (!(sheet.getRow(i) == null)) {
-//                    XSSFRow row = sheet.getRow(i);
-//                    if (!isXSSFCellEmpty(row.getCell(2))) {
-//                        for (int j = 3; j < 36; j++) {
-//                            if (!isXSSFCellEmpty(row.getCell(j))) {
-//                                for(String code: codesList.get(j-1)){
-//                                    Component component = componentRepository.findByPn(row.getCell(2).getStringCellValue()).orElseThrow();
-//                                    log.info(component.getName());
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+    }
+
+    private static List<Integer> getTabsIndexesList(XSSFWorkbook workbook) {
+        List<Integer> commercialOcmTabsIndex = new ArrayList<>();
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP  X"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP  L"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP T"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP  P"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP Z"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP C"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TP  E"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("ThinkBook  "));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("NB V&B  "));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("DT AIO V&E"));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TS "));
+        commercialOcmTabsIndex.add(workbook.getSheetIndex("TC  M&SE"));
+        return commercialOcmTabsIndex;
     }
 
     private Set<String> extractModelCode(String header) {
@@ -215,14 +228,17 @@ public class CatalogInitializeService {
     private String getHSSFCellValue(HSSFCell cell) {
         if(cell.getCellType().equals(CellType.NUMERIC)){
             return String.valueOf(cell.getNumericCellValue());
-        }else if(cell.getCellType().equals(CellType.STRING))
+        } else if(cell.getCellType().equals(CellType.STRING))
             return cell.getStringCellValue();
         else return "";
     }
     private String getXSSFCellValue(XSSFCell cell) {
-        if(cell.getCellType().equals(CellType.NUMERIC)){
+        if(cell == null) {
+            return "";
+        }
+        if(cell.getCellType().equals(CellType.NUMERIC)) {
             return String.valueOf(cell.getNumericCellValue());
-        }else if(cell.getCellType().equals(CellType.STRING))
+        } else if(cell.getCellType().equals(CellType.STRING))
             return cell.getStringCellValue();
         else return "";
     }

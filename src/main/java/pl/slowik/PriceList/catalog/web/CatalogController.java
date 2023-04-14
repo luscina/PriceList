@@ -3,7 +3,6 @@ package pl.slowik.PriceList.catalog.web;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
@@ -11,9 +10,7 @@ import pl.slowik.PriceList.catalog.application.port.CatalogUseCase.UpdateNoteboo
 import pl.slowik.PriceList.catalog.domain.Component;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequestMapping("/notebook")
@@ -54,13 +51,13 @@ public class CatalogController {
         catalogUseCase.updateNotebookPrice(command.toUpdateNotebookPriceCommand(id));
     }
 
-    @GetMapping(value = "{id}/components")
-    public Set<RestComponent> findCompatibleComponents(@PathVariable Long id){
-        return catalogUseCase.findCompileComponents(id).
-                stream()
-                .map(this::toRestComponent)
-                .collect(Collectors.toSet());
-    }
+//    @GetMapping(value = "{id}/components")
+//    public Set<RestComponent> findCompatibleComponents(@PathVariable Long id){
+//        return catalogUseCase.findCompileComponents(id).
+//                stream()
+//                .map(this::toRestComponent)
+//                .collect(Collectors.toSet());
+//    }
 
     private RestNotebook toRestNotebook(Notebook notebook){
         return new RestNotebook(
