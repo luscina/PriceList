@@ -11,7 +11,6 @@ import java.util.Set;
 @Entity
 @Getter
 @Setter
-@JsonIgnoreProperties({"componentSet"})
 public class Model {
     @Id
     @GeneratedValue

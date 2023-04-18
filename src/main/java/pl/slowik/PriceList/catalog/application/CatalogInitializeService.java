@@ -120,7 +120,7 @@ public class CatalogInitializeService {
             file = new FileInputStream("ocm_apr_2023.xlsx");
             XSSFWorkbook workbook = new XSSFWorkbook(file);
             List<Integer> commercialOcmTabsIndex = getTabsIndexesList(workbook);
-            //for(int tabIndex : commercialOcmTabsIndex) { //iteration through sheets
+            for(int tabIndex : commercialOcmTabsIndex) { //iteration through sheets
                 XSSFSheet sheet = workbook.getSheetAt(4);
                 int lastRowNum = sheet.getLastRowNum();
                 XSSFRow headersRow = sheet.getRow(1);
@@ -155,7 +155,7 @@ public class CatalogInitializeService {
                         }
                     }
                 }
-            //}
+            }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -189,7 +189,7 @@ public class CatalogInitializeService {
                 codes.add(code);
             }
         }
-        if(codes.size() > 1) {
+        if(codes.size() > 0) {
             return codes;
         } else return null;
     }

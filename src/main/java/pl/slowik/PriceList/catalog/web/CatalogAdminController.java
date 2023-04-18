@@ -23,7 +23,6 @@ public class CatalogAdminController {
     public void initializeModels(){
         catalogInitializeService.initializeModels();
     }
-
     @PostMapping("/notebooks")
     private void initializeNotebooks(){
         catalogInitializeService.initializeNotebooks();

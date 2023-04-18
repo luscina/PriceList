@@ -11,10 +11,9 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
-@JsonIgnoreProperties({"compatibleModels"})
 public class Component {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String pn;
     private String name;
