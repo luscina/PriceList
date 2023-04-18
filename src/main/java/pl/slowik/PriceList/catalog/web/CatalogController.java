@@ -11,6 +11,7 @@ import pl.slowik.PriceList.catalog.domain.Component;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequestMapping("/notebook")
@@ -51,13 +52,13 @@ public class CatalogController {
         catalogUseCase.updateNotebookPrice(command.toUpdateNotebookPriceCommand(id));
     }
 
-//    @GetMapping(value = "{id}/components")
-//    public Set<RestComponent> findCompatibleComponents(@PathVariable Long id){
-//        return catalogUseCase.findCompileComponents(id).
-//                stream()
-//                .map(this::toRestComponent)
-//                .collect(Collectors.toSet());
-//    }
+    @GetMapping(value = "{id}/components")
+    public Set<RestComponent> findCompatibleComponents(@PathVariable Long id){
+        return catalogUseCase.findCompileComponents(id).
+                stream()
+                .map(this::toRestComponent)
+                .collect(Collectors.toSet());
+    }
 
     private RestNotebook toRestNotebook(Notebook notebook){
         return new RestNotebook(

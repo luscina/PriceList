@@ -18,15 +18,14 @@ public class CatalogAdminController {
     public void initializeComponents(){
         catalogInitializeService.initializeComponents();
     }
+    @PostMapping("/notebooks")
+    @Transactional
+    public void initializeNotebooks(){
+        catalogInitializeService.initializeNotebooks();
+    }
     @PostMapping("/models")
     @Transactional
     public void initializeModels(){
         catalogInitializeService.initializeModels();
     }
-
-    @PostMapping("/notebooks")
-    private void initializeNotebooks(){
-        catalogInitializeService.initializeNotebooks();
-    }
-
 }

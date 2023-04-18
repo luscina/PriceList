@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
 import pl.slowik.PriceList.catalog.db.JpaModelRepository;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
+import pl.slowik.PriceList.catalog.domain.Component;
 import pl.slowik.PriceList.catalog.domain.ComponentModel;
 import pl.slowik.PriceList.catalog.domain.Model;
 import pl.slowik.PriceList.catalog.domain.Notebook;
@@ -14,6 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor
@@ -50,7 +52,7 @@ class CatalogService implements CatalogUseCase {
         jpaNotebookRepository.deleteById(id);
     }
 
-    public Set<ComponentModel> findCompileComponents(Long id){
+    public Set<Component> findCompileComponents(Long id){
         String pn = jpaNotebookRepository.findById(id).stream()
                 .map(Notebook::getPn)
                 .findFirst()
@@ -60,6 +62,9 @@ class CatalogService implements CatalogUseCase {
                 .stream()
                 .findAny()
                 .orElseThrow();
-        return model.getComponentModelSet();
+        return model.getComponentModels()
+                .stream()
+                .map(ComponentModel::getComponent)
+                .collect(Collectors.toSet());
     }
 }
