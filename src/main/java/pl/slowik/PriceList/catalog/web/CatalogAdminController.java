@@ -28,4 +28,16 @@ public class CatalogAdminController {
     public void initializeModels(){
         catalogInitializeService.initializeModels();
     }
+    @PostMapping("/all")
+    @Transactional
+    public void initializeAll(){
+        catalogInitializeService.initializeComponents();
+        catalogInitializeService.initializeModels();
+        catalogInitializeService.initializeNotebooks();
+    }
+    @PostMapping("/warranties")
+    @Transactional
+    public void initializeWarranties(){
+        catalogInitializeService.initializeWarranties();
+    }
 }

@@ -21,4 +21,8 @@ public class Model {
     public void addComponentModel(ComponentModel componentModel){
         componentModels.add(componentModel);
     }
+    @OneToMany(mappedBy = "model")
+    private Set<Notebook> notebooks;
+    @OneToMany(mappedBy = "model")
+    private Set<Warranty> warranties;
 }

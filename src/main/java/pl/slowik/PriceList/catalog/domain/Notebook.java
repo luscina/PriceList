@@ -3,9 +3,7 @@ package pl.slowik.PriceList.catalog.domain;
 import lombok.Getter;
 import lombok.Setter;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.math.BigDecimal;
 
 @Setter
@@ -16,6 +14,9 @@ public class Notebook {
     @GeneratedValue
     private Long id;
     private String pn;
+    @ManyToOne
+    @JoinColumn(name = "model_id", nullable = false)
+    private Model model;
     private String eanCode;
     private String productFamily;
     private String productSeries;
