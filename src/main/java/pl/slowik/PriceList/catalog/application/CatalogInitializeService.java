@@ -10,10 +10,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.slowik.PriceList.catalog.db.JpaComponentRepository;
-import pl.slowik.PriceList.catalog.db.JpaModelRepository;
-import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
-import pl.slowik.PriceList.catalog.db.JpaWarrantyRepository;
+import pl.slowik.PriceList.catalog.db.*;
 import pl.slowik.PriceList.catalog.domain.*;
 
 import java.io.FileInputStream;
@@ -39,10 +36,7 @@ public class CatalogInitializeService {
                 HSSFWorkbook workbook = new HSSFWorkbook(file);
                 HSSFSheet sheet = workbook.getSheetAt(workbook.getSheetIndex("Notebooki"));
                 HSSFRow headersRow = sheet.getRow(1);
-                List<String> headersValue = new ArrayList<>();
-                for (int i = 0; i < headersRow.getLastCellNum(); i++) {
-                    headersValue.add(getHSSFCellValue(headersRow.getCell(i)));
-                }
+                List<String> headersValue = createHeadrsValueList(headersRow);
                 for (int i = 2; i < 279; i++) {
                     Notebook notebook = new Notebook();
                     HSSFRow row = sheet.getRow(i);
@@ -86,6 +80,15 @@ public class CatalogInitializeService {
                 throw new RuntimeException(e);
             }
     }
+
+    private List<String> createHeadrsValueList(HSSFRow headersRow) {
+        List<String> headersValue = new ArrayList<>();
+        for (int i = 0; i < headersRow.getLastCellNum(); i++) {
+            headersValue.add(getHSSFCellValue(headersRow.getCell(i)));
+        }
+        return headersValue;
+    }
+
     @Transactional
     public void initializeComponents() {
         FileInputStream file;
@@ -94,10 +97,7 @@ public class CatalogInitializeService {
             HSSFWorkbook workbook = new HSSFWorkbook(file);
             HSSFSheet sheet = workbook.getSheetAt(workbook.getSheetIndex("Akcesoria"));
             HSSFRow headersRow = sheet.getRow(1);
-            List<String> headersValue = new ArrayList<>();
-            for (int i = 0; i < headersRow.getLastCellNum(); i++) {
-                headersValue.add(getHSSFCellValue(headersRow.getCell(i)));
-            }
+            List<String> headersValue = createHeadrsValueList(headersRow);
             for (int i = 2; i < sheet.getLastRowNum(); i++) {
                 if(!isHSSFCellEmpty(sheet.getRow(i).getCell(0))){
                     HSSFRow row = sheet.getRow(i);
@@ -195,7 +195,6 @@ public class CatalogInitializeService {
                         String modelCode = getHSSFCellValue(row.getCell(headersRowValue.indexOf("Machine Type")));
                         if (modelRepository.findByPn(modelCode).isPresent()) {
                             Warranty warranty = new Warranty();
-                            log.info(getHSSFCellValue(row.getCell(headersRowValue.indexOf("Machine Type"))));
                             warranty.setPn(getHSSFCellValue(row.getCell(headersRowValue.indexOf("ePack Part Number"))));
                             warranty.setBaseWarranty(getHSSFCellValue(row.getCell(headersRowValue.indexOf("Base Warranty"))));
                             warranty.setDescription(getHSSFCellValue(row.getCell(headersRowValue.indexOf("Upgrade Service Description"))));

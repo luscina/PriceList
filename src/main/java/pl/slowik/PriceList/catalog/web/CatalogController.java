@@ -9,6 +9,7 @@ import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
 import pl.slowik.PriceList.catalog.application.port.CatalogUseCase.UpdateNotebookPriceCommand;
 import pl.slowik.PriceList.catalog.domain.Component;
 import pl.slowik.PriceList.catalog.domain.Notebook;
+import pl.slowik.PriceList.catalog.domain.Warranty;
 
 import java.util.List;
 import java.util.Set;
@@ -23,6 +24,7 @@ public class CatalogController {
 
 
     @GetMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     private ResponseEntity<RestNotebook> findById(@PathVariable Long id) {
         return catalogUseCase.findById(id)
                 .stream()
@@ -58,6 +60,29 @@ public class CatalogController {
                 stream()
                 .map(this::toRestComponent)
                 .collect(Collectors.toSet());
+    }
+    @GetMapping(value = "{id}/memory")
+    public Set<RestComponent> findCompatibleMemory(@PathVariable Long id){
+        return catalogUseCase.findCompileMemory(id).
+                stream()
+                .map(this::toRestComponent)
+                .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "{id}/warranties")
+    public Set<RestWarranty> findCompatibleWarranties(@PathVariable Long id){
+        return catalogUseCase.findCompileWarranties(id)
+                .stream()
+                .map(this::toRestWarranty)
+                .collect(Collectors.toSet());
+    }
+
+    @GetMapping(value = "/warranties")
+    private List<RestWarranty> findAllWarranties(){
+        return catalogUseCase.findAllWarranties()
+                .stream()
+                .map(this::toRestWarranty)
+                .collect(Collectors.toList());
     }
 
     private RestNotebook toRestNotebook(Notebook notebook){
@@ -106,6 +131,14 @@ public class CatalogController {
                 component.getBpPricePromo()
         );
     }
+    private RestWarranty toRestWarranty(Warranty warranty){
+        return new RestWarranty(
+                warranty.getPn(),
+                warranty.getDescription(),
+                warranty.getBaseWarranty(),
+                warranty.getBpPrice()
+        );
+    }
 
     @Data
     private static class RestNotebookPriceUpdateCommand {
@@ -118,4 +151,5 @@ public class CatalogController {
             return new UpdateNotebookPriceCommand(id, bpPrice, pbPricePln, srpPrice);
         }
     }
+
 }

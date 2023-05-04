@@ -1,9 +1,6 @@
 package pl.slowik.PriceList.catalog.domain;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -13,6 +10,7 @@ import java.math.BigDecimal;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = "model")
 public class Warranty {
     @Id
     @GeneratedValue
@@ -24,5 +22,4 @@ public class Warranty {
     @JoinColumn(name = "model_id", nullable = false)
     private Model model;
     private BigDecimal bpPrice;
-
 }
