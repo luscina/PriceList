@@ -1,11 +1,9 @@
 package pl.slowik.PriceList.catalog.web;
-
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import pl.slowik.PriceList.catalog.application.CatalogInitializeService;
-
 import javax.transaction.Transactional;
 
 @RestController

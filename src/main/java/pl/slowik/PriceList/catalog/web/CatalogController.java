@@ -134,6 +134,7 @@ public class CatalogController {
     private RestWarranty toRestWarranty(Warranty warranty){
         return new RestWarranty(
                 warranty.getPn(),
+                warranty.getModel().getPn(),
                 warranty.getDescription(),
                 warranty.getBaseWarranty(),
                 warranty.getBpPrice()
