@@ -35,7 +35,7 @@ public class CatalogAdminController {
     }
     @PostMapping("/all")
     @Transactional
-    public void initializeAll(){
+    public void initializeAll() {
         catalogInitializeService.initializeComponents();
         catalogInitializeService.initializeModels();
         catalogInitializeService.initializeNotebooks();

@@ -15,7 +15,7 @@ public class Notebook {
     private Long id;
     private String pn;
     @ManyToOne
-    @JoinColumn(name = "model_id", nullable = false)
+    @JoinColumn(name = "model_id")
     private Model model;
     private String eanCode;
     private String productFamily;

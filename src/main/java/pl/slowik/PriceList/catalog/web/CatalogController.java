@@ -23,7 +23,6 @@ public class CatalogController {
 
     private final CatalogUseCase catalogUseCase;
 
-
     @GetMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     private ResponseEntity<RestNotebook> findById(@PathVariable Long id) {
@@ -36,13 +35,12 @@ public class CatalogController {
 
     }
     @GetMapping
-    private List<RestNotebook> getAll(){
+    private List<RestNotebook> getAll() {
         return catalogUseCase.findAll()
                 .stream()
                 .map(this::toRestNotebook)
                 .collect(Collectors.toList());
     }
-
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteById(@PathVariable Long id){
@@ -52,27 +50,25 @@ public class CatalogController {
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     @Secured("ROLE_ADMIN")
-    public void updateNotebookPrice(@PathVariable Long id, @RequestBody RestNotebookPriceUpdateCommand command){
+    public void updateNotebookPrice(@PathVariable Long id, @RequestBody RestNotebookPriceUpdateCommand command) {
         catalogUseCase.updateNotebookPrice(command.toUpdateNotebookPriceCommand(id));
     }
-
     @GetMapping(value = "{id}/components")
-    public Set<RestComponent> findCompatibleComponents(@PathVariable Long id){
+    public Set<RestComponent> findCompatibleComponents(@PathVariable Long id) {
         return catalogUseCase.findCompileComponents(id).
                 stream()
                 .map(this::toRestComponent)
                 .collect(Collectors.toSet());
     }
     @GetMapping(value = "{id}/memory")
-    public Set<RestComponent> findCompatibleMemory(@PathVariable Long id){
+    public Set<RestComponent> findCompatibleMemory(@PathVariable Long id) {
         return catalogUseCase.findCompileMemory(id).
                 stream()
                 .map(this::toRestComponent)
                 .collect(Collectors.toSet());
     }
-
     @GetMapping(value = "{id}/warranties")
-    public Set<RestWarranty> findCompatibleWarranties(@PathVariable Long id){
+    public Set<RestWarranty> findCompatibleWarranties(@PathVariable Long id) {
         return catalogUseCase.findCompileWarranties(id)
                 .stream()
                 .map(this::toRestWarranty)
@@ -80,14 +76,14 @@ public class CatalogController {
     }
 
     @GetMapping(value = "/warranties")
-    private List<RestWarranty> findAllWarranties(){
+    private List<RestWarranty> findAllWarranties() {
         return catalogUseCase.findAllWarranties()
                 .stream()
                 .map(this::toRestWarranty)
                 .collect(Collectors.toList());
     }
 
-    private RestNotebook toRestNotebook(Notebook notebook){
+    private RestNotebook toRestNotebook(Notebook notebook) {
         return new RestNotebook(
                 notebook.getId(),
                 notebook.getPn(),
@@ -121,7 +117,7 @@ public class CatalogController {
                 );
     }
 
-    private RestComponent toRestComponent(Component component){
+    private RestComponent toRestComponent(Component component) {
         return new RestComponent(
                 component.getId(),
                 component.getPn(),
@@ -133,7 +129,7 @@ public class CatalogController {
                 component.getBpPricePromo()
         );
     }
-    private RestWarranty toRestWarranty(Warranty warranty){
+    private RestWarranty toRestWarranty(Warranty warranty) {
         return new RestWarranty(
                 warranty.getPn(),
                 warranty.getModel().getPn(),

@@ -19,7 +19,7 @@ public class Warranty {
     private String description;
     private String baseWarranty;
     @ManyToOne
-    @JoinColumn(name = "model_id", nullable = false)
+    @JoinColumn(name = "model_id")
     private Model model;
     private BigDecimal bpPrice;
 }

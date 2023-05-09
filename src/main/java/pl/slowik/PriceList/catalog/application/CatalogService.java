@@ -11,7 +11,6 @@ import pl.slowik.PriceList.catalog.db.JpaWarrantyRepository;
 import pl.slowik.PriceList.catalog.domain.*;
 
 import java.math.BigDecimal;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
