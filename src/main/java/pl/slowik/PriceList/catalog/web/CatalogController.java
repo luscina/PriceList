@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.*;
 import pl.slowik.PriceList.catalog.application.port.CatalogUseCase;
 import pl.slowik.PriceList.catalog.application.port.CatalogUseCase.UpdateNotebookPriceCommand;
@@ -50,6 +51,7 @@ public class CatalogController {
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.ACCEPTED)
+    @Secured("ROLE_ADMIN")
     public void updateNotebookPrice(@PathVariable Long id, @RequestBody RestNotebookPriceUpdateCommand command){
         catalogUseCase.updateNotebookPrice(command.toUpdateNotebookPriceCommand(id));
     }

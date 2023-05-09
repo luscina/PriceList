@@ -1,5 +1,6 @@
 package pl.slowik.PriceList.catalog.web;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -7,6 +8,7 @@ import pl.slowik.PriceList.catalog.application.CatalogInitializeService;
 import javax.transaction.Transactional;
 
 @RestController
+@Secured("ROLE_ADMIN")
 @RequestMapping("/admin")
 @AllArgsConstructor
 public class CatalogAdminController {
@@ -26,16 +28,17 @@ public class CatalogAdminController {
     public void initializeModels(){
         catalogInitializeService.initializeModels();
     }
+    @PostMapping("/warranties")
+    @Transactional
+    public void initializeWarranties(){
+        catalogInitializeService.initializeWarranties();
+    }
     @PostMapping("/all")
     @Transactional
     public void initializeAll(){
         catalogInitializeService.initializeComponents();
         catalogInitializeService.initializeModels();
         catalogInitializeService.initializeNotebooks();
-    }
-    @PostMapping("/warranties")
-    @Transactional
-    public void initializeWarranties(){
         catalogInitializeService.initializeWarranties();
     }
 }
