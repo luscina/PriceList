@@ -14,6 +14,7 @@ import pl.slowik.PriceList.catalog.db.*;
 import pl.slowik.PriceList.catalog.domain.*;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -28,6 +29,7 @@ public class CatalogInitializeService {
     private final JpaComponentRepository componentRepository;
     private final JpaModelRepository modelRepository;
     private final JpaWarrantyRepository warrantyRepository;
+    private final JpaComponentFootnoteRepository componentFootnoteRepository;
     @Transactional
     public void initializeNotebooks() {
         FileInputStream file;
@@ -206,6 +208,24 @@ public class CatalogInitializeService {
                 }
             }
 
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    public void initializeFootnotes() {
+        FileInputStream file;
+        try {
+            file = new FileInputStream("ocm_apr_2023.xlsx");
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+            XSSFSheet footnoteSheet = workbook.getSheet("Footnote");
+            int lastRowNum = footnoteSheet.getLastRowNum();
+            for (int i = 1; i < lastRowNum + 1; i++) {
+                XSSFRow row = footnoteSheet.getRow(i);
+                ComponentFootnote componentFootnote = new ComponentFootnote();
+                componentFootnote.setFootnoteId(getXSSFCellValue(row.getCell(0)));
+                componentFootnote.setFootnoteDesc(getXSSFCellValue(row.getCell(1)));
+                componentFootnoteRepository.save(componentFootnote);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

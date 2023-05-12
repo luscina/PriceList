@@ -33,6 +33,10 @@ public class CatalogAdminController {
     public void initializeWarranties(){
         catalogInitializeService.initializeWarranties();
     }
+    @PostMapping("/footnotes")
+    public void initializeFootnotes() {
+        catalogInitializeService.initializeFootnotes();
+    }
     @PostMapping("/all")
     @Transactional
     public void initializeAll() {
