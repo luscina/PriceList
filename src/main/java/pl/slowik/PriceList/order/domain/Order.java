@@ -12,6 +12,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
+@Builder
 public class Order {
     @Id
     @GeneratedValue
@@ -22,8 +23,4 @@ public class Order {
     private Set<OrderItem> orderItems;
     @ManyToOne
     private Recipient recipient;
-    public Order(Set<OrderItem> orderItems, Recipient recipient){
-        this.orderItems = orderItems;
-        this.recipient = recipient;
-    }
 }

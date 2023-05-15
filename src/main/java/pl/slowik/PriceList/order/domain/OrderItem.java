@@ -21,4 +21,8 @@ public class OrderItem {
     private Long id;
     private Notebook notebook;
     private int quantity;
+    public OrderItem(Notebook notebook, int quantity){
+        this.notebook = notebook;
+        this.quantity = quantity;
+    }
 }

@@ -21,6 +21,7 @@ public interface CatalogUseCase {
     Set<Warranty> findCompileWarranties(Long id);
     Set<Component> findCompileMemory(Long notebookId);
     List<Warranty> findAllWarranties();
+    List<String> findWarrantiesDescriptions();
 
     @Value
     @Builder
