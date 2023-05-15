@@ -12,10 +12,7 @@ import java.util.Set;
 @Getter
 @Setter
 @ToString(exclude = "warranties")
-public class Model {
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Model extends BaseCatalogItem {
     private String pn;
     @OneToMany(mappedBy = "component", cascade = CascadeType.ALL)
     private Set<ComponentModel> componentModels = new HashSet<>();

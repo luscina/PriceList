@@ -12,6 +12,8 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -32,7 +34,8 @@ public class PriceListSecurityConfiguration {
         http.csrf().disable();
         http
                 .authorizeHttpRequests()
-                .antMatchers(HttpMethod.GET, "/notebook/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/notebook/**", "/users").permitAll()
+                .antMatchers(HttpMethod.POST, "/users").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -48,6 +51,10 @@ public class PriceListSecurityConfiguration {
                 .roles("ADMIN")
                 .build();
         return new InMemoryUserDetailsManager(admin);
+    }
+    @Bean
+    PasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
 }

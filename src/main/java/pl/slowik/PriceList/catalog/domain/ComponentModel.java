@@ -10,10 +10,7 @@ import javax.persistence.*;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ComponentModel {
-    @Id
-    @GeneratedValue
-    private Long id;
+public class ComponentModel extends BaseCatalogItem {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "component_id")
     private Component component;

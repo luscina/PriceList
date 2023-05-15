@@ -35,16 +35,16 @@ public class CatalogController {
 
     }
     @GetMapping
-    private List<RestNotebook> getAll() {
-        return catalogUseCase.findAll()
+    private List<RestNotebook> getAllNotebooks() {
+        return catalogUseCase.findAllNotebooks()
                 .stream()
                 .map(this::toRestNotebook)
                 .collect(Collectors.toList());
     }
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteById(@PathVariable Long id){
-        catalogUseCase.deleteById(id);
+    public void deleteNotebookById(@PathVariable Long id){
+        catalogUseCase.deleteNotebookById(id);
     }
 
     @PatchMapping("/{id}")

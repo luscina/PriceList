@@ -43,7 +43,7 @@ class CatalogServiceTest {
         notebookRepository.save(notebook2);
 
         //when
-        List<Notebook> all = catalog.findAll();
+        List<Notebook> all = catalog.findAllNotebooks();
 
         //then
         Assertions.assertEquals(2, all.size());
@@ -93,9 +93,8 @@ class CatalogServiceTest {
         notebookRepository.save(notebook2);
 
         //when
-        catalog.deleteById(1L);
-        List<Notebook> all = catalog.findAll();
-
+        catalog.deleteNotebookById(1L);
+        List<Notebook> all = catalog.findAllNotebooks();
         //then
         Assertions.assertEquals(1, all.size());
     }

@@ -11,16 +11,12 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
-public class Component {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class Component extends BaseCatalogItem {
     private String pn;
     private String name;
     private String category;
     private String subCategory;
     private String EAN;
-    private BigDecimal bpPrice;
     private BigDecimal bpPricePromo;
     @OneToMany(mappedBy = "model")
     private Set<ComponentModel> componentModels = new HashSet<>();

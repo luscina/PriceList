@@ -30,7 +30,7 @@ class CatalogService implements CatalogUseCase {
     }
 
     @Override
-    public List<Notebook> findAll() {
+    public List<Notebook> findAllNotebooks() {
         return jpaNotebookRepository.findAll();
     }
 
@@ -49,7 +49,7 @@ class CatalogService implements CatalogUseCase {
         return notebook;
     }
 
-    public void deleteById(Long id) {
+    public void deleteNotebookById(Long id) {
         jpaNotebookRepository.deleteById(id);
     }
 

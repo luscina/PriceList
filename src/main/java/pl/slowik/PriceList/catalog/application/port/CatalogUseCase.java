@@ -14,14 +14,13 @@ import java.util.Set;
 
 public interface CatalogUseCase {
     Optional<Notebook> findById(Long id);
-    List<Notebook> findAll();
-    void deleteById(Long id);
+    List<Notebook> findAllNotebooks();
+    void deleteNotebookById(Long id);
     void updateNotebookPrice(UpdateNotebookPriceCommand command);
     Set<Component> findCompileComponents(Long id);
     Set<Warranty> findCompileWarranties(Long id);
     Set<Component> findCompileMemory(Long notebookId);
     List<Warranty> findAllWarranties();
-    List<String> findWarrantiesDescriptions();
 
     @Value
     @Builder

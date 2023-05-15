@@ -9,10 +9,7 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 @Entity
-public class Notebook {
-    @Id
-    @GeneratedValue
-    private Long id;
+public class Notebook extends BaseCatalogItem {
     private String pn;
     @ManyToOne
     @JoinColumn(name = "model_id")
@@ -21,7 +18,6 @@ public class Notebook {
     private String productFamily;
     private String productSeries;
     private String status;
-    private BigDecimal bpPrice;
     private BigDecimal bpPricePln;
     private BigDecimal srpPrice;
     private String base;
