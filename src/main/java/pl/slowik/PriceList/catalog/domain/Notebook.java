@@ -1,7 +1,10 @@
 package pl.slowik.PriceList.catalog.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -9,7 +12,11 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 @Entity
-public class Notebook extends BaseCatalogItem {
+public class Notebook {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private BigDecimal bpPrice;
     private String pn;
     @ManyToOne
     @JoinColumn(name = "model_id")

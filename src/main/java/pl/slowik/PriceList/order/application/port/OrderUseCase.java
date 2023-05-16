@@ -16,7 +16,7 @@ public interface OrderUseCase {
     }
     @Value
     class OrderItemCommand{
-        Long itemId;
+        String itemId;
         int quantity;
     }
 }

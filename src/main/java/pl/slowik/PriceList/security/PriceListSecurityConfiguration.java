@@ -34,8 +34,8 @@ public class PriceListSecurityConfiguration {
         http.csrf().disable();
         http
                 .authorizeHttpRequests()
-                .antMatchers(HttpMethod.GET, "/notebook/**", "/users").permitAll()
-                .antMatchers(HttpMethod.POST, "/users").permitAll()
+                .antMatchers(HttpMethod.GET, "/notebook/**", "/users", "/order/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/users", "/admin/**", "/order/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()

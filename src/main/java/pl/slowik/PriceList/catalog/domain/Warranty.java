@@ -3,6 +3,7 @@ package pl.slowik.PriceList.catalog.domain;
 import lombok.*;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
 @Getter
@@ -10,7 +11,11 @@ import javax.persistence.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString(exclude = "model")
-public class Warranty extends BaseCatalogItem{
+public class Warranty {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private BigDecimal bpPrice;
     private String pn;
     private String description;
     private String baseWarranty;

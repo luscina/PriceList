@@ -8,7 +8,6 @@ import pl.slowik.PriceList.catalog.application.CatalogInitializeService;
 import javax.transaction.Transactional;
 
 @RestController
-@Secured("ROLE_ADMIN")
 @RequestMapping("/admin")
 @AllArgsConstructor
 public class CatalogAdminController {

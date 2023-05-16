@@ -5,7 +5,9 @@ import org.springframework.stereotype.Service;
 import pl.slowik.PriceList.catalog.db.JpaNotebookRepository;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 import pl.slowik.PriceList.order.application.port.OrderUseCase;
+import pl.slowik.PriceList.order.db.JpaOrderItemRepository;
 import pl.slowik.PriceList.order.db.JpaOrderRepository;
+import pl.slowik.PriceList.order.db.JpaRecipientRepository;
 import pl.slowik.PriceList.order.domain.Order;
 import pl.slowik.PriceList.order.domain.OrderItem;
 import pl.slowik.PriceList.order.domain.Recipient;
@@ -22,26 +24,35 @@ import java.util.stream.Collectors;
 public class OrderService implements OrderUseCase {
     private final JpaOrderRepository orderRepository;
     private final JpaNotebookRepository notebookRepository;
-    private final JpaUserRepository userRepository;
+    private final JpaRecipientRepository recipientRepository;
+    private final JpaOrderItemRepository orderItemRepository;
 
     @Override
     public void placeOrder(PlaceOrderCommand command) {
         Set<OrderItem> items = command
                 .getItems()
-                .stream().map(this::toOrderItem)
+                .stream()
+                .map(this::toOrderItem)
                 .collect(Collectors.toSet());
         Order order = Order
                 .builder()
                 .orderItems(items)
-                .recipient(command.getRecipient())
+                .recipient(getOrCreateRecipient(command.getRecipient()))
                 .build();
         orderRepository.save(order);
     }
 
     private OrderItem toOrderItem(OrderItemCommand command){
-        Notebook notebook = notebookRepository.findById(command.getItemId()).orElseThrow();
+        Notebook notebook = notebookRepository.findById(Long.parseLong(command.getItemId())).orElseThrow();
         int quantity = command.getQuantity();
         return new OrderItem(notebook, quantity);
     }
 
+    private Recipient getOrCreateRecipient(Recipient recipient) {
+        Recipient returnedRecipient = recipientRepository
+                .findByEmailIgnoreCase(recipient.getEmail())
+                .orElse(recipient);
+        recipientRepository.save(recipient);
+        return returnedRecipient;
+    }
 }

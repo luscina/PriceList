@@ -10,6 +10,7 @@ import java.util.Set;
 @Getter
 @Setter
 @AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "orders")
 @EntityListeners(AuditingEntityListener.class)
 @Builder

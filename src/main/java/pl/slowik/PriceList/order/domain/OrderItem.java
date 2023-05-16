@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import pl.slowik.PriceList.catalog.domain.Notebook;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Getter
 @Setter
@@ -19,6 +17,8 @@ public class OrderItem {
     @Id
     @GeneratedValue
     private Long id;
+    @ManyToOne
+    @JoinColumn(name = "notebook_id")
     private Notebook notebook;
     private int quantity;
     public OrderItem(Notebook notebook, int quantity){

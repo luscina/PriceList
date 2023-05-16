@@ -11,7 +11,11 @@ import java.util.Set;
 @Entity
 @Setter
 @Getter
-public class Component extends BaseCatalogItem {
+public class Component {
+    @Id
+    @GeneratedValue
+    private Long id;
+    private BigDecimal bpPrice;
     private String pn;
     private String name;
     private String category;
