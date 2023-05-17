@@ -11,6 +11,7 @@ import pl.slowik.PriceList.order.domain.Order;
 import pl.slowik.PriceList.order.domain.OrderItem;
 import pl.slowik.PriceList.order.domain.Recipient;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,6 +34,16 @@ public class OrderController {
                 .stream()
                 .map(this::toRestOrder)
                 .collect(Collectors.toList());
+    }
+
+    @GetMapping(value = "/{id}/file")
+    public void getExcelOrder(@PathVariable Long id){
+        Order order = orderRepository.findById(id).orElseThrow();
+        try {
+            orderUseCase.orderToExcel(order);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private RestOrder toRestOrder(Order order){
