@@ -46,7 +46,7 @@ public class PriceListSecurityConfiguration {
     @Bean
     public UserDetailsService users(){
         UserDetails admin = User.builder()
-                .username("admin")
+                .username("{noop}admin")
                 .password("{noop}admin")
                 .roles("ADMIN")
                 .build();
