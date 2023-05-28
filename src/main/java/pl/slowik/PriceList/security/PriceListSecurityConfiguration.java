@@ -36,7 +36,7 @@ public class PriceListSecurityConfiguration {
                 .authorizeHttpRequests()
                 .antMatchers(HttpMethod.GET, "/notebook/**", "/users", "/order/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/users", "/admin/**", "/order/**").permitAll()
-                .mvcMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
+                .antMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -47,7 +47,7 @@ public class PriceListSecurityConfiguration {
     @Bean
     public UserDetailsService users(){
         UserDetails admin = User.builder()
-                .username("{noop}admin")
+                .username("admin")
                 .password("{noop}admin")
                 .roles("ADMIN")
                 .build();
